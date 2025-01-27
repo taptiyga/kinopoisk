@@ -1,0 +1,200 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #1a191f;
+    font-family: "Open Sans", sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    height: 60px;
+}
+
+@media(max-width:450px) {
+    .header__content {
+        flex-direction: column;
+    }
+}
+
+.content-header__logo {
+    font-size: 32px;
+    text-decoration: none;
+    color: orange;
+}
+
+.content-header__search {
+    padding: 8px;
+    border: 2px solid #1a191f;
+    border-radius: 5px;
+    outline: none;
+    background-color: orange;
+}
+
+.content-header__search::placeholder {
+    color: #fff;
+}
+
+.movies {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+@media(max-width:450px) {
+    .movies {
+        padding-top: 50px;
+    }
+}
+
+.card-movies {
+    width: 240px;
+    margin: 10px;
+    position: relative;
+}
+
+.card-movies__inner {
+    position: relative;
+    height: 360px;
+}
+
+.card-movies__img {
+    max-width: 100%;
+    height: 100%;
+}
+
+.card-movies__darkened {
+    background-color: #000000;
+    opacity: 0.1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.card-movies__darkened:hover {
+    background-color: grey;
+    cursor: pointer;
+}
+
+.info-movies {
+    padding: 10px 0;
+}
+
+.info-movies__title {
+    font-size: 16px;
+    color: #fff;
+}
+
+.info-movies__category {
+    font-size: 14px;
+    color: #ffd80e;
+}
+
+.info-movies__average {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    background-color: #1a191f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 14px;
+}
+
+.info-movies__average_green {
+    border: 1px solid green;
+}
+
+.info-movies__average_orange {
+    border: 1px solid orange;
+}
+
+.info-movies__average_red {
+    border: 1px solid red;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: width 2s;
+}
+
+.modal__show {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+}
+
+.card-modal {
+    background-color: #ffffff;
+    max-width: 600px;
+    padding: 50px 16px;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.5);
+    background-color: #1a191f;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.card-modal__backdrop {
+    width: 200px;
+    margin: 0 auto;
+}
+
+.card-modal__info {
+    margin-left: 20px;
+}
+
+.card-modal__button_close {
+    padding: 5px;
+    margin: 10px;
+    align-self: center;
+
+}
+
+.info-modal__site {
+    color: #ffd80e
+}
+
+ul li {
+    padding: 5px;
+}
+
+.stop-scrolling {
+    height: 100%;
+    overflow: hidden;
+}
+
+.button {
+    background-color: orange;
+    color: #fff;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+}
