@@ -1,18 +1,25 @@
 const API_KEY = "8c8e1a50-6322-4135-8875-5d40a5420d86";
 const API_URL_POPULAR =
-    "https://kinopoiskapiunofficial.tech/api/v2.2/films/top?type=TOP_100_POPULAR_FILMS&page=1";
+    "https://kinopoiskapiunofficial.tech/api/v2.2/films/top?type=TOP_100_POPULAR_FILMS&page=";
 const API_URL_SEARCH =
     "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword?keyword=";
-const API_URL_MOVIE_DETAILS = "https://kinopoiskapiunofficial.tech/api/v2.2/films/"
+const API_URL_MOVIE_DETAILS = "https://kinopoiskapiunofficial.tech/api/v2.2/films/";
 
-getMovies(API_URL_POPULAR)
+let currentPage = 1; // Текущая страница
+let loading = false; // Указатель загрузки
 
+// Начальная загрузка популярных фильмов
+getMovies(`${API_URL_POPULAR}${currentPage}`);
+
+// Функция для получения фильмов с текущей страницы
 async function getMovies(url) {
+    if (loading) return; // Если загрузка идёт, выйти
+    loading = true; // Устанавливаем флаг загрузки
     try {
         const resp = await fetch(url, {
             headers: {
                 "Content-Type": "application/json",
-                "X-API-KEY": API_KEY // Убедитесь, что API_KEY определен
+                "X-API-KEY": API_KEY
             }
         });
 
@@ -22,62 +29,61 @@ async function getMovies(url) {
         }
 
         const respData = await resp.json();
-        showMovies(respData)
+        showMovies(respData);
     } catch (error) {
         console.error('Произошла ошибка при получении данных:', error);
+    } finally {
+        loading = false; // Сбрасываем флаг загрузки после завершения загрузки
     }
 }
 
 function getClassByRate(value) {
     if (value >= 7) {
-        return 'green'
+        return 'green';
     } else if (value > 5) {
-        return 'orange'
+        return 'orange';
     } else {
-        return 'red'
+        return 'red';
     }
 }
 
 function showMovies(data) {
-    const moviesEl = document.querySelector('.movies')
-
-    document.querySelector('.movies').innerHTML = ''
+    const moviesEl = document.querySelector('.movies');
 
     data.films.forEach((movie) => {
-        const movieEl = document.createElement('div')
-        movieEl.classList.add('card-movies', 'movies__card')
+        const movieEl = document.createElement('div');
+        movieEl.classList.add('card-movies', 'movies__card');
         movieEl.innerHTML = `
             <div class="card-movies__inner">
-                    <img src="${movie.posterUrlPreview}" alt="${movie.nameRu}"
-                        class="card-movies__img">
-                    <div class="card-movies__darkened"></div>
-                </div>
-                <div class="card-movies__info info-movies">
-                    <div class="info-movies__title">${movie.nameRu}</div>
-                    <div class="info-movies__category">${movie.genres.map(
-            (genre) => `${genre.genre}`
-        ).join(', ')}</div>
-    ${movie.rating ? `<div class="info-movies__average info-movies__average_${getClassByRate(movie.rating)}">${movie.rating}</div>` : ''}
-                </div>`
-        movieEl.addEventListener('click', () => openModal(movie.filmId))
-        moviesEl.appendChild(movieEl)
+                <img src="${movie.posterUrlPreview}" alt="${movie.nameRu}" class="card-movies__img">
+                <div class="card-movies__darkened"></div>
+            </div>
+            <div class="card-movies__info info-movies">
+                <div class="info-movies__title">${movie.nameRu}</div>
+                <div class="info-movies__category">${movie.genres.map(genre => `${genre.genre}`).join(', ')}</div>
+                ${movie.rating ? `<div class="info-movies__average info-movies__average_${getClassByRate(movie.rating)}">${movie.rating}</div>` : ''}
+            </div>`;
+        movieEl.addEventListener('click', () => openModal(movie.filmId));
+        moviesEl.appendChild(movieEl);
     });
 }
 
-const form = document.querySelector('form')
-const search = document.querySelector('.content-header__search')
+const form = document.querySelector('form');
+const search = document.querySelector('.content-header__search');
 
 form.addEventListener('submit', (e) => {
-    e.preventDefault()
-    const apiSearchUrl = `${API_URL_SEARCH}${search.value}`
+    e.preventDefault();
+    const apiSearchUrl = `${API_URL_SEARCH}${search.value}`;
     if (search.value) {
-        getMovies(apiSearchUrl)
-        search.value = ''
+        currentPage = 1; // Сбрасываем текущую страницу
+        document.querySelector('.movies').innerHTML = ''; // Очищаем предыдущие результаты
+        getMovies(apiSearchUrl);
+        search.value = '';
     }
-})
+});
 
 // Modal
-const modal = document.querySelector('.modal')
+const modal = document.querySelector('.modal');
 async function openModal(id) {
     try {
         const resp = await fetch(API_URL_MOVIE_DETAILS + id, {
@@ -87,15 +93,13 @@ async function openModal(id) {
             }
         });
         const respData = await resp.json();
-        modal.classList.add('modal__show')
-        document.body.classList.add('stop-scrolling')
+        modal.classList.add('modal__show');
+        document.body.classList.add('stop-scrolling');
 
         modal.innerHTML = `     
-                <div class="modal__card card-modal">
+            <div class="modal__card card-modal">
                 <img src="${respData.posterUrl}" alt="" class="card-modal__backdrop">
-               
                 <h2 class="card-modal__title">${respData.nameRu}</h2>
-               
                 <span class="card-modal__year">Год - ${respData.year}</span>
                 <ul class="card-modal__info info-modal">
                     <div class="loader"></div>
@@ -105,29 +109,38 @@ async function openModal(id) {
                     <li class="info-modal__overview">Описание - ${respData.description}</li>
                 </ul>
                 <button type="button" class="card-modal__button_close button">Закрыть</button>
-                </div>
-                `
-        const btnClose = document.querySelector('.card-modal__button_close')
-        btnClose.addEventListener('click', () => closeModal())
+            </div>`;
+        const btnClose = document.querySelector('.card-modal__button_close');
+        btnClose.addEventListener('click', () => closeModal());
     } catch (error) {
         console.error('Произошла ошибка при получении данных:', error);
     }
 }
+
 function closeModal() {
-    modal.classList.remove('modal__show')
-    document.body.classList.remove('stop-scrolling')
+    modal.classList.remove('modal__show');
+    document.body.classList.remove('stop-scrolling');
 }
 
 window.addEventListener('click', (e) => {
     if (e.target === modal) {
-        closeModal()
+        closeModal();
     }
-})
+});
+
 window.addEventListener('keydown', (e) => {
-    if (e.keyCode === 27) {
-        closeModal()
+    if (e.key === 'Escape') {
+        closeModal();
     }
-})
+});
+
+// Обработчик события прокрутки для бесконечной загрузки
+window.addEventListener('scroll', async () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        currentPage++; // Увеличиваем номер страницы для следующей загрузки
+        await getMovies(`${API_URL_POPULAR}${currentPage}`); // Загружаем фильмы на следующей странице
+    }
+});
 // Объяснение кода
 
 // Объявление функции:
